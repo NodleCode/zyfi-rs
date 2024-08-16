@@ -14,16 +14,16 @@ const ZYFI_PAYMASTER_URL: &str = "https://api.zyfi.org/api/erc20_paymaster/v1";
 
 pub struct ClientZyFi {
     /// API Key to authenticate with ZyFi
-    api_key: Option<String>,
+    pub api_key: Option<String>,
 
     /// Address of the token to use when paying for fees
-    fee_token_address: Option<String>,
+    pub fee_token_address: Option<String>,
 
     /// Whether to use the testnet or mainnet
-    testnet: bool,
+    pub testnet: bool,
 
     /// Chain ID to use, defaults to ZkSync mainnet
-    chain_id: u32,
+    pub chain_id: u32,
 }
 
 impl Default for ClientZyFi {
