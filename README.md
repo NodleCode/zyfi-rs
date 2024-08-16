@@ -1,0 +1,1 @@
+# `zyfi-rs`: a minimal Rust client for [ZyFi API](https://docs.zyfi.org/)
