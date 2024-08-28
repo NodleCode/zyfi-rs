@@ -103,7 +103,8 @@ impl ClientZyFi {
     }
 
     pub async fn handle_response(&self, response: reqwest::Response) -> Result<ZyFiResponse> {
-        if response.status().is_success() {
+        let status = response.status();
+        if status.is_success() {
             let response = response.json::<ZyFiResponse>().await.map_err(|e| {
                 error!("Failed to parse ZyFi response: {:?}", e);
                 anyhow!("Failed to parse ZyFi response: {:?}", e)
@@ -111,6 +112,7 @@ impl ClientZyFi {
             debug!("ZyFi response: {:?}", response);
             Ok(response)
         } else {
+            println!("{}", status);
             let error = response.text().await?;
             error!("ZyFi error: {:?}", error);
             bail!("ZyFi error: {:?}", error);
@@ -123,13 +125,17 @@ mod tests {
     use super::*;
     use std::env;
 
-    const TX_FROM: &str = "0xd1e5e09ef8f5ab7d59c14d8a0847e76a71163a82";
-    const TX_TO: &str = "0x95b3641d549f719eb5105f9550eca4a7a2f305de";
-    const TX_DATA: &str = "0xd204c45e000000000000000000000000d1e5e09ef8f5ab7d59c14d8a0847e76a71163a8200000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000035697066733a2f2f516d4e574d6e37586468514a426233376350334b59654659556d4538505a64373750754645734c4e66454b7150630000000000000000000000";
+    const MAINNET_TX_FROM: &str = "0xd1e5e09ef8f5ab7d59c14d8a0847e76a71163a82";
+    const MAINNET_TX_TO: &str = "0x95b3641d549f719eb5105f9550eca4a7a2f305de";
+    const MAINNET_TX_DATA: &str = "0xd204c45e000000000000000000000000d1e5e09ef8f5ab7d59c14d8a0847e76a71163a8200000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000035697066733a2f2f516d4e574d6e37586468514a426233376350334b59654659556d4538505a64373750754645734c4e66454b7150630000000000000000000000";
+
+    const TESTNET_TX_FROM: &str = "0xd7aFa0aF9F93dbf58CF26ffA17f3e72D639c6483";
+    const TESTNET_TX_TO: &str = "0x999368030Ba79898E83EaAE0E49E89B7f6410940";
+    const TESTNET_TX_DATA: &str = "0xd204c45e000000000000000000000000d1e5e09ef8f5ab7d59c14d8a0847e76a71163a8200000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000035697066733a2f2f516d4e574d6e37586468514a426233376350334b59654659556d4538505a64373750754645734c4e66454b7150630000000000000000000000";
 
     #[tokio::test]
     #[ignore = "requires API key"]
-    async fn test_sponsored() {
+    async fn test_sponsored_mainnet() {
         let api_key = env::var("ZYFI_API_KEY").unwrap();
         let client = ClientZyFi {
             api_key: Some(api_key),
@@ -138,16 +144,45 @@ mod tests {
         };
 
         let response = client
-            .sponsored(TX_FROM.to_string(), TX_TO.to_string(), TX_DATA.to_string())
+            .sponsored(
+                MAINNET_TX_FROM.to_string(),
+                MAINNET_TX_TO.to_string(),
+                MAINNET_TX_DATA.to_string(),
+            )
             .await;
         assert!(response.is_ok());
 
         let response = response.unwrap();
-        println!("{:?}", response);
+        println!("Mainnet sponsored response unwrapped: {:?}", response);
     }
 
     #[tokio::test]
-    async fn test_paymaster() {
+    #[ignore = "requires API key"]
+    async fn test_sponsored_testnet() {
+        let api_key = env::var("ZYFI_API_KEY").unwrap();
+        let client = ClientZyFi {
+            api_key: Some(api_key),
+            testnet: true,
+            chain_id: 300,
+            ..Default::default()
+        };
+
+        let response = client
+            .sponsored(
+                TESTNET_TX_FROM.to_string(),
+                TESTNET_TX_TO.to_string(),
+                TESTNET_TX_DATA.to_string(),
+            )
+            .await;
+        println!("Testnet sponsored response: {:?}", response);
+        assert!(response.is_ok());
+
+        let response = response.unwrap();
+        println!("Testnet sponsored response unwrapped: {:?}", response);
+    }
+
+    #[tokio::test]
+    async fn test_paymaster_mainnet() {
         let client = ClientZyFi {
             testnet: false,
             fee_token_address: Some("0xBD4372e44c5eE654dd838304006E1f0f69983154".to_string()),
@@ -155,11 +190,38 @@ mod tests {
         };
 
         let response = client
-            .paymaster(TX_FROM.to_string(), TX_TO.to_string(), TX_DATA.to_string())
+            .paymaster(
+                MAINNET_TX_FROM.to_string(),
+                MAINNET_TX_TO.to_string(),
+                MAINNET_TX_DATA.to_string(),
+            )
             .await;
         assert!(response.is_ok());
 
         let response = response.unwrap();
-        println!("{:?}", response);
+        println!("Mainnet paymaster response unwrapped: {:?}", response);
+    }
+
+    #[tokio::test]
+    async fn test_paymaster_testnet() {
+        let client = ClientZyFi {
+            testnet: true,
+            chain_id: 300,
+            fee_token_address: Some("0xb4B74C2BfeA877672B938E408Bae8894918fE41C".to_string()), // Use appropriate testnet token address
+            ..Default::default()
+        };
+
+        let response = client
+            .paymaster(
+                TESTNET_TX_FROM.to_string(),
+                TESTNET_TX_TO.to_string(),
+                TESTNET_TX_DATA.to_string(),
+            )
+            .await;
+        println!("Testnet paymaster response: {:?}", response);
+        assert!(response.is_ok());
+
+        let response = response.unwrap();
+        println!("Testnet paymaster response unwrapped: {:?}", response);
     }
 }
