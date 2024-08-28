@@ -140,7 +140,6 @@ mod tests {
         let response = client
             .sponsored(TX_FROM.to_string(), TX_TO.to_string(), TX_DATA.to_string())
             .await;
-        println!("{:?}", response);
         assert!(response.is_ok());
 
         let response = response.unwrap();
@@ -158,7 +157,6 @@ mod tests {
         let response = client
             .paymaster(TX_FROM.to_string(), TX_TO.to_string(), TX_DATA.to_string())
             .await;
-        println!("{:?}", response);
         assert!(response.is_ok());
 
         let response = response.unwrap();
