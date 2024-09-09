@@ -42,6 +42,7 @@ impl ClientZyFi {
         tx_from: String,
         tx_to: String,
         tx_data: String,
+        gas_limit: Option<String>,
     ) -> Result<ZyFiResponse> {
         let request = in_types::Request {
             chain_id: self.chain_id,
@@ -53,6 +54,7 @@ impl ClientZyFi {
                 data: tx_data,
             },
             is_testnet: self.testnet,
+            gas_limit,
             ..Default::default()
         };
 
@@ -78,6 +80,7 @@ impl ClientZyFi {
         tx_from: String,
         tx_to: String,
         tx_data: String,
+        gas_limit: Option<String>,
     ) -> Result<ZyFiResponse> {
         let request = in_types::Request {
             chain_id: self.chain_id,
@@ -88,6 +91,7 @@ impl ClientZyFi {
             },
             is_testnet: self.testnet,
             fee_token_address: self.fee_token_address.clone(),
+            gas_limit,
             ..Default::default()
         };
 
@@ -148,6 +152,7 @@ mod tests {
                 MAINNET_TX_FROM.to_string(),
                 MAINNET_TX_TO.to_string(),
                 MAINNET_TX_DATA.to_string(),
+                None,
             )
             .await;
         assert!(response.is_ok());
@@ -172,6 +177,7 @@ mod tests {
                 TESTNET_TX_FROM.to_string(),
                 TESTNET_TX_TO.to_string(),
                 TESTNET_TX_DATA.to_string(),
+                None,
             )
             .await;
         println!("Testnet sponsored response: {:?}", response);
@@ -194,6 +200,7 @@ mod tests {
                 MAINNET_TX_FROM.to_string(),
                 MAINNET_TX_TO.to_string(),
                 MAINNET_TX_DATA.to_string(),
+                None,
             )
             .await;
         assert!(response.is_ok());
@@ -216,6 +223,7 @@ mod tests {
                 TESTNET_TX_FROM.to_string(),
                 TESTNET_TX_TO.to_string(),
                 TESTNET_TX_DATA.to_string(),
+                None,
             )
             .await;
         println!("Testnet paymaster response: {:?}", response);

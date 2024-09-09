@@ -19,4 +19,6 @@ pub struct Request {
     pub replay_limit: Option<u8>,
     pub tx_data: TxData,
     pub is_testnet: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gas_limit: Option<String>,
 }
