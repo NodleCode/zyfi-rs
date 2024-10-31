@@ -7,6 +7,7 @@ mod in_types;
 mod out_types;
 
 pub use in_types::TxData as ZyFiRequest;
+pub use out_types::PaymasterParams as ZyFiPaymasterParams;
 pub use out_types::Response as ZyFiResponse;
 
 const ZYFI_SPONSORED_URL: &str = "https://api.zyfi.org/api/erc20_sponsored_paymaster/v1";
